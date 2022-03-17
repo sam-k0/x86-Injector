@@ -31,15 +31,23 @@ cmd = hobbl_com_check_command(1); // Check for event on slot 1
 
 if(cmd == injectBtn)
 {
-
     dll = hobbl_com_edit_getline(pathText, 0)
     index = hobbl_com_listbox_getsel(wndList);
     show_debug_message("Index"+string(index));
     wnd = dsWndList[|index]
     
+    // Catch trolls
+    if(dll == "" or wnd == undefined)
+    {
+        hobbl_com_dialog_messagebox(hwnd_main, "Please specify the DLL and the window", "Error", api_mb_ok | api_mb_iconexclamation)
+        exit;
+    }
+    
     // Inject   
     show_debug_message(dll)
     show_debug_message(wnd)
+    
+    
     var result = inj_try_injection(dll, wnd);
     
     switch(round(result)) // Check result
@@ -111,6 +119,35 @@ if(cmd == textBtnDlg)
     }
     show_debug_message("done!")
 }
+
+// git btn
+if(cmd == gitBtn)
+{
+    url_open("https://github.com/sam-k0/x86-Injector");
+}
+// abt btn
+if(cmd == abtBtn)
+{
+    var txt = "x86 Injector made in C++ / GM:S
+    Credits go to:
+    - Hobbl (Max Win Api 2 extension)
+    - Random people on StackOverflow
+    
+    This project is on GitHub!
+    
+    Usage:
+    1. Select DLL
+    2. Press on (...) next to the empty window list
+    3. Select a window
+    4. Press Inject
+    "
+    hobbl_com_dialog_showabout(hwnd_main, "About", txt, bm_injector)
+}
+
+
+
+
+
 
 </string>
           </argument>
@@ -184,10 +221,11 @@ hwnd_GM = int64(window_handle());
 hwnd_main = hobbl_com_window_create(0, window_get_x(), window_get_y(), 500, 200, api_ws_visible | api_ws_caption | api_ws_sysmenu, api_ws_ex_topmost);
 
 ico_main = hobbl_com_resource_loadicon("main.ico")
-show_debug_message(ico_main)
 hobbl_com_window_seticon(hwnd_main, ico_main)
 
 ico_syringe =  hobbl_com_resource_loadicon("syringe.ico")
+
+bm_injector = hobbl_com_resource_loadbitmap("icon.bmp")
 
 hobbl_com_window_settext(hwnd_main, "DLL Injector")
 </string>
@@ -247,7 +285,13 @@ hobbl_com_button_setimage(injectBtn, 1, ico_syringe)
 
 hobbl_com_check_set(1, hwnd_main)
 
+// GitHub button
+gitBtn = hobbl_com_button_create(hwnd_main,  5, 100+32, 80, 20, 0,0)
+hobbl_com_control_settext(gitBtn, "GitHub Source")
 
+// About button
+abtBtn = hobbl_com_button_create(hwnd_main, 430+32, 140, 20, 20, 0, 0)
+hobbl_com_control_settext(abtBtn, "?")
 </string>
           </argument>
         </arguments>
