@@ -1,1 +1,4 @@
 *.nsi linguist-language-GML
+**.nsi linguist-language-GML
+**.gmx linguist-language-GML
+*.gmx linguist-language-GML
