@@ -3,3 +3,6 @@
 /#backups/
 **.rtf
 **.png
+Debug/**
+Debug/*
+/Debug/
