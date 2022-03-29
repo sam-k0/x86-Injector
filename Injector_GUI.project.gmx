@@ -2,8 +2,9 @@
 <assets>
   <Configs name="configs">
     <Config>Configs\Default</Config>
+    <Config>Configs\YYC</Config>
   </Configs>
-  <datafiles number="6" name="datafiles">
+  <datafiles number="7" name="datafiles">
     <datafile>
       <name>main.ico</name>
       <exists>-1</exists>
@@ -16,6 +17,9 @@
       <store>0</store>
       <ConfigOptions>
         <Config name="Default">
+          <CopyToMask>9223372036854775807</CopyToMask>
+        </Config>
+        <Config name="YYC">
           <CopyToMask>9223372036854775807</CopyToMask>
         </Config>
       </ConfigOptions>
@@ -35,6 +39,9 @@
         <Config name="Default">
           <CopyToMask>9223372036854775807</CopyToMask>
         </Config>
+        <Config name="YYC">
+          <CopyToMask>9223372036854775807</CopyToMask>
+        </Config>
       </ConfigOptions>
       <filename>ApiEntryDLL.dll</filename>
     </datafile>
@@ -50,6 +57,9 @@
       <store>0</store>
       <ConfigOptions>
         <Config name="Default">
+          <CopyToMask>9223372036854775807</CopyToMask>
+        </Config>
+        <Config name="YYC">
           <CopyToMask>9223372036854775807</CopyToMask>
         </Config>
       </ConfigOptions>
@@ -69,6 +79,9 @@
         <Config name="Default">
           <CopyToMask>9223372036854775807</CopyToMask>
         </Config>
+        <Config name="YYC">
+          <CopyToMask>9223372036854775807</CopyToMask>
+        </Config>
       </ConfigOptions>
       <filename>main.ico</filename>
     </datafile>
@@ -84,6 +97,9 @@
       <store>0</store>
       <ConfigOptions>
         <Config name="Default">
+          <CopyToMask>9223372036854775807</CopyToMask>
+        </Config>
+        <Config name="YYC">
           <CopyToMask>9223372036854775807</CopyToMask>
         </Config>
       </ConfigOptions>
@@ -103,8 +119,31 @@
         <Config name="Default">
           <CopyToMask>9223372036854775807</CopyToMask>
         </Config>
+        <Config name="YYC">
+          <CopyToMask>9223372036854775807</CopyToMask>
+        </Config>
       </ConfigOptions>
       <filename>syringe.ico</filename>
+    </datafile>
+    <datafile>
+      <name>minimize.ico</name>
+      <exists>-1</exists>
+      <size>100431</size>
+      <exportAction>2</exportAction>
+      <exportDir></exportDir>
+      <overwrite>0</overwrite>
+      <freeData>-1</freeData>
+      <removeEnd>0</removeEnd>
+      <store>0</store>
+      <ConfigOptions>
+        <Config name="Default">
+          <CopyToMask>9223372036854775807</CopyToMask>
+        </Config>
+        <Config name="YYC">
+          <CopyToMask>9223372036854775807</CopyToMask>
+        </Config>
+      </ConfigOptions>
+      <filename>minimize.ico</filename>
     </datafile>
   </datafiles>
   <NewExtensions>
@@ -121,6 +160,10 @@
   <rooms name="rooms">
     <room>rooms\mainWnd</room>
   </rooms>
+  <constants number="2">
+    <constant name="TRAY_WND_RESTORE">-1126</constant>
+    <constant name="TRAY_NUM_SYRINGE">1</constant>
+  </constants>
   <help>
     <rtf>help.rtf</rtf>
   </help>

@@ -29,6 +29,12 @@
 
 cmd = hobbl_com_check_command(1); // Check for event on slot 1
 
+if(cmd != 0)
+{
+    show_debug_message(string(cmd))
+}
+
+
 if(cmd == injectBtn)
 {
     dll = hobbl_com_edit_getline(pathText, 0)
@@ -68,7 +74,6 @@ if(cmd == injectBtn)
 
 if(cmd == pathBtnDlg)
 {
-
     show_debug_message("open dlg")
     
     hobbl_com_filedialog_prepare("DLL files (*.dll)|*.dll","","c:\",".dll"); // Prepares settings
@@ -88,7 +93,7 @@ if(cmd == pathBtnDlg)
     hobbl_com_control_enable(textBtnDlg, canRefresh)
 }
 
-
+// Get new window list?
 if(cmd == textBtnDlg)
 {
     ds_list_destroy(dsWndList) // clear the dslist
@@ -98,17 +103,30 @@ if(cmd == textBtnDlg)
     canRefresh = false; // set blocked
     hobbl_com_control_enable(textBtnDlg, canRefresh) // disable btn
 
-    
     // enumerate wnds
+    show_debug_message("hello")
     hobbl_com_find_enumwindows();
+    show_debug_message("hello1")
     cnt = hobbl_com_find_getnumfound();
+    show_debug_message("hello2")
     cur = 0;
     while(cur &lt; cnt)
     {
+        show_debug_message(cur)
+        
         curhwnd = hobbl_com_find_getfoundhandle(cur);
+        show_debug_message("curhwnd: " + string(curhwnd))
+        
         var text = hobbl_com_window_gettext(curhwnd);
+        show_debug_message("text: " + string(text))
+        
         var class = string(hobbl_com_window_getclassname(curhwnd));
+        show_debug_message("class: " + string(class))
+        
         var par = hobbl_com_window_getparent(curhwnd); 
+        show_debug_message("par: " + string(par))
+        
+        
         if(true &amp;&amp; text != "")
         {
             show_debug_message( text + "-" + class + "-" + string(par));
@@ -118,6 +136,47 @@ if(cmd == textBtnDlg)
         cur ++;      
     }
     show_debug_message("done!")
+}
+// Sys tray dialog
+if(cmd == TRAY_WND_RESTORE &amp;&amp; inTray)
+{
+    // Prevent some weird bug?
+    if(hobbl_com_check_secondarycommand(1) == -514 || hobbl_com_check_secondarycommand(1) == -515) // Idek why this is
+    {
+        inTray = false;
+        // Remove from tray
+        hobbl_com_systray_remove(hwnd_main, TRAY_NUM_SYRINGE)
+        // Restore window
+        hobbl_com_window_show(hwnd_main, api_sw_show)
+        hobbl_com_window_setexstyle(hwnd_main, api_ws_ex_topmost)
+        show_debug_message("Window restored!")
+    }
+}
+// Minimize button
+if(cmd == minimizeBtn &amp;&amp; !inTray)
+{
+    // add systray
+    hobbl_com_systray_add(hwnd_main, "Injector", TRAY_NUM_SYRINGE);
+    hobbl_com_systray_prepareballoon("Injector","Minimized to tray!",100,api_niif_user | api_niif_nosound); // Set balloon settings
+    hobbl_com_systray_setballoon(hwnd_main,TRAY_NUM_SYRINGE); // Display the balloon
+    hobbl_com_window_show(hwnd_main, api_sw_hide);
+    inTray = true;
+}
+
+// Copy title btn
+
+if(cmd == copyWndTitleBtn)
+{
+    // Get the titlestring
+    index = hobbl_com_listbox_getsel(wndList);
+    show_debug_message("Index"+string(index));
+    wnd = dsWndList[|index]
+    // Check if title is not undefined
+    if(wnd != undefined)
+    {
+        //Copy to clipboard
+        clipboard_set_text(wnd)
+    }
 }
 
 // git btn
@@ -194,6 +253,11 @@ if(!hobbl_com_window_exists(hwnd_main))game_end()
           <argument>
             <kind>1</kind>
             <string>ds_list_destroy(dsWndList)
+
+if(inTray)
+{
+    hobbl_com_systray_remove(hwnd_main, TRAY_NUM_SYRINGE)
+}
 </string>
           </argument>
         </arguments>
@@ -221,13 +285,15 @@ hwnd_GM = int64(window_handle());
 hwnd_main = hobbl_com_window_create(0, window_get_x(), window_get_y(), 500, 200, api_ws_visible | api_ws_caption | api_ws_sysmenu, api_ws_ex_topmost);
 
 ico_main = hobbl_com_resource_loadicon("main.ico")
-hobbl_com_window_seticon(hwnd_main, ico_main)
 
 ico_syringe =  hobbl_com_resource_loadicon("syringe.ico")
 
 bm_injector = hobbl_com_resource_loadbitmap("icon.bmp")
 
+ico_minimize = hobbl_com_resource_loadicon("minimize.ico")
+
 hobbl_com_window_settext(hwnd_main, "DLL Injector")
+hobbl_com_window_seticon(hwnd_main, ico_syringe)
 </string>
           </argument>
         </arguments>
@@ -249,8 +315,11 @@ hobbl_com_window_settext(hwnd_main, "DLL Injector")
           <argument>
             <kind>1</kind>
             <string>/// create controls
-stb_cont = hobbl_com_status_create(hwnd_main, api_ccs_top,0);
-hobbl_com_status_settext(stb_cont, 0, "C++ DLL Injector - " + string(GM_version) + " Runtime ver. " + string(GM_runtime_version));
+hobbl_com_check_set(1, hwnd_main)
+// Top bar thing
+stb_cont = hobbl_com_edit_create(hwnd_main, 5, 8, 250, 20, api_es_left | api_es_readonly, 0);
+hobbl_com_edit_setsel(stb_cont, 0,0);
+hobbl_com_edit_replaceselection(stb_cont, 0, "C++ DLL Injector - " + string(GM_version) + " Runtime ver. " + string(GM_runtime_version));
 
 // DLL path label
 labelY = 32; 
@@ -278,20 +347,29 @@ wndList = hobbl_com_listbox_create(hwnd_main, 100, labelY, 350, 100, api_lbs_has
 textBtnDlg = hobbl_com_button_create(hwnd_main, 430+32, labelY, 20, 20, 0, 0); // File dlg
 hobbl_com_control_settext(textBtnDlg, "...");
 
-// Button
-injectBtn = hobbl_com_button_create(hwnd_main, 5, 100, 80, 20, 0,0)
+//// Main column
+// Copy window title button
+copyWndTitleBtn = hobbl_com_button_create(hwnd_main,  5,80 , 80, 20, 0,0)
+hobbl_com_control_settext(copyWndTitleBtn, "Copy Title")
+
+// Inject btn
+injectBtn = hobbl_com_button_create(hwnd_main, 5, 112, 80, 20, 0,0)
 hobbl_com_control_settext(injectBtn, "Inject")
 hobbl_com_button_setimage(injectBtn, 1, ico_syringe)
 
-hobbl_com_check_set(1, hwnd_main)
-
 // GitHub button
-gitBtn = hobbl_com_button_create(hwnd_main,  5, 100+32, 80, 20, 0,0)
+gitBtn = hobbl_com_button_create(hwnd_main,  5, 144, 80, 20, 0,0)
 hobbl_com_control_settext(gitBtn, "GitHub Source")
+//// End main column
 
 // About button
 abtBtn = hobbl_com_button_create(hwnd_main, 430+32, 140, 20, 20, 0, 0)
 hobbl_com_control_settext(abtBtn, "?")
+
+// Minimize Button
+minimizeBtn = hobbl_com_button_create(hwnd_main, 418, 8, 64, 20, 0, 0)
+hobbl_com_control_settext(minimizeBtn, "minimize")
+hobbl_com_button_setimage(minimizeBtn, 1, ico_minimize)
 </string>
           </argument>
         </arguments>
@@ -318,9 +396,34 @@ hobbl_com_window_show(hwnd_GM, api_sw_hide);
 
 dsWndList = ds_list_create();
 canRefresh = false;
-
+inTray = false;
 
 hobbl_com_control_enable(textBtnDlg, 0)
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>/// Self notification
+show_debug_message("*****************************\n")
+show_debug_message("DO NOT FORGET TO CHANGE CONFIGURATION FOR YYC COMPILATION!\n")
+show_debug_message("*****************************\n")
+
 </string>
           </argument>
         </arguments>
