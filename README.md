@@ -6,6 +6,8 @@ Functionality:
 - Iterates all windows in one click
 - Copy the window title of any window
 - Allows minimizing the window to the system tray area
+- And, of course, it can inject x86 DLLs into x86 processes
+- Made in C++. Only scriptkiddies use C#
 
 Credits to:
 Hobbl - Max Win Api 2 (Used for GUI and Window management)
