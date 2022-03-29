@@ -1,6 +1,11 @@
 # x86-Injector
 A x86 DLL Injector with GUI. Because GUI is nice.
 
+Functionality:
+- Select file from dialog
+- Iterates all windows in one click
+- Copy the window title of any window
+- Allows minimizing the window to the system tray area
 
 Credits to:
 Hobbl - Max Win Api 2 (Used for GUI and Window management)
